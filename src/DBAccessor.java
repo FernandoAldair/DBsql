@@ -1,3 +1,5 @@
+import javax.sound.midi.Soundbank;
+import javax.swing.plaf.nimbus.State;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -115,196 +117,154 @@ public class DBAccessor {
         return conn;
     }
 
-
-    public void altaAutor() throws SQLException, IOException {
-        Scanner reader = new Scanner(System.in);
-        System.out.println("Introdueix el id de l'autor");
-        int id = reader.nextInt();
-        System.out.println("Introdueix el nom");
-        reader.nextLine();
-        String nom = reader.nextLine();
-        System.out.println("Introdueix l'any de naixement");
-        String any_naixement = reader.nextLine();
-        System.out.println("Introdueix la nacionalitat");
-        String nacionalitat = reader.nextLine();
-        System.out.println("Es actiu? (S/N)");
-        String actiu = reader.nextLine();
-
-        Statement statement = null;
-        statement = conn.createStatement();
-        statement.executeUpdate("INSERT INTO autors VALUES ("+id+",'"+nom+"','"+any_naixement+"','"+nacionalitat+"','"+actiu+"')");
-
-
-    }
-
-    public void altaRevista() throws SQLException, NumberFormatException, IOException, ParseException {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        Scanner reader = new Scanner(System.in);
-        System.out.println("Introdueix el id de la revista");
-        int id = reader.nextInt();
-        System.out.println("Introdueix el titol");
-        reader.nextLine();
-        String titol = reader.nextLine();
-        System.out.println("Introdueix la data de publicacio (yyyy-mm-dd)");
-        Date date = format.parse(reader.nextLine());
-
-        Statement statement = null;
-        statement = conn.createStatement();
-        statement.executeUpdate("INSERT INTO revistes (id_revista, titol, data_publicacio) VALUES ("+id+",'"+titol+"','"+date+"')");
-
-    }
-
-
-    public void altaArticle() throws SQLException, NumberFormatException, IOException, ParseException {
-
-        // TODO demana per consola els valors dels diferents atributs
-        // d'article, excepte aquells que poden ser nuls , i realitza la
-        // inserció d'un registre
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        Scanner reader = new Scanner(System.in);
-        System.out.println("Introdueix el id del Articulo");
-        int id  = reader.nextInt();
-        System.out.println("Introdueix el titol");
-        reader.nextLine();
-        String titol = reader.nextLine();
-        System.out.println("Introdueix la data de publicacio (yyyy-mm-dd)");
-        Date date = format.parse(reader.nextLine());
-
-        Statement statement = null;
-        statement = conn.createStatement();
-        statement.executeUpdate("INSERT INTO revistes (id_revista, titol, data_publicacio) VALUES ("+id+",'"+titol+"','"+date+"')");
-
-
-    }
-
-    public void afegeixArticleARevista(Connection conn) throws SQLException {
-
-        ResultSet rs = null;
-        Statement st = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
-        InputStreamReader isr = new InputStreamReader(System.in);
-        BufferedReader br = new BufferedReader(isr);
-
-        try {
-            rs = st.executeQuery("SELECT * FROM articles WHERE id_revista IS NULL");
-
-            if (rs.getFetchSize() == 0) {
-                System.out.println("No hi ha articles pendents d'associar revistes. ");
-            } else {
-                while (rs.next()) {
-                    System.out.println("Titol: " + rs.getString("titol"));
-
-                    System.out.println("Vol incorporar aquest article a una revista?");
-                    String resposta = br.readLine();
-
-                    if (resposta.equals("si")) {
-                        // demana l'identificador de la revista
-                        System.out.println("Introdueix el id de la revista");
-                        int idRevista = Integer.parseInt(br.readLine());
-                        // actualitza el camp
-                        rs.updateInt("id_revista", idRevista);
-                        // actualitza la fila
-                        rs.updateRow();
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    public void mostraEquip() throws SQLException, IOException {
+        Statement statement = conn.createStatement();
+        ResultSet resultSet;
+        resultSet = statement.executeQuery("SELECT * FROM team");
+        while (resultSet.next()) {
+            System.out.println("Name: " + resultSet.getString("name") + "\t" +
+                    "type: " + resultSet.getString("type") + "\t" +
+                    "country: " + resultSet.getString("country") + "\t" +
+                    "city: " + resultSet.getString("city") + "\t" +
+                    "court name: " + resultSet.getString("court_name"));
         }
+        resultSet.close();
+        statement.close();
+    }
+
+    public void mostrarPlayer()throws SQLException{
+        Statement statement =  conn.createStatement();
+        ResultSet resultSet;
+        resultSet = statement.executeQuery("SELECT * FROM player");
+        while (resultSet.next()) {
+            System.out.println("Federation license code: "+resultSet.getString("federation_license_code")+"\t" +
+                    "first name: "+resultSet.getString("first_name")+"\t" +
+                    "last name: "+resultSet.getString("last_name")+"\t" +
+                    "birth date: "+resultSet.getString("birth_date")+"\t" +
+                    "gender: "+resultSet.getString("gender")+"\t" +
+                    "height: "+resultSet.getString("height")+"\t" +
+                    "team name: "+resultSet.getString("team_name")+"\t" +
+                    "mvp total: "+resultSet.getString("mvp_total"));
+        }
+        resultSet.close();
+        statement.close();
+    }
+
+    public void crearEquipo() throws SQLException{
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Insertar nombre del equipo:");
+        String nombre = scanner.nextLine();
+        System.out.println("Insertar el tipo 1 o 2(Escoger numero):");
+        System.out.println("1- Club");
+        System.out.println("2- Nacional");
+        int opcion = scanner.nextInt();
+        String tipo;
+        if (opcion == 1){
+            tipo = "Club";
+        } else tipo = "Nacional";
+        System.out.println("Insertar pais:");
+        String pais = scanner.nextLine();
+        String ciudad="";
+        if (opcion == 2){
+            System.out.println("Insertar ciudad:");
+            ciudad = scanner.nextLine();
+        }
+        System.out.println("Insertar cancha del equipo:");
+        String court = scanner.nextLine();
+
+        Statement statement = null;
+        statement = conn.createStatement();
+        statement.executeUpdate("INSERT team VALUES ('"+nombre+"','"+tipo+"','"+pais+"','"+ciudad+"','"+court+"')");
+
+        statement.close();
+    }
+
+    public void crearPlayer() throws SQLException, IOException, ParseException {
+        Scanner scanner = new Scanner(System.in);
+        SimpleDateFormat fecha = new SimpleDateFormat("yyyy-MM-dd");
+        System.out.println("Inserar Federation license code:");
+        String federation = scanner.nextLine();
+        System.out.println("Insertar nombre:");
+        String nombre = scanner.nextLine();
+        System.out.println("Insertar apellidos:");
+        String apellidos = scanner.nextLine();
+        System.out.println("Insertar fecha de nacimiento(año-mes-dia:0000-00-00):");
+        Date date = fecha.parse(scanner.nextLine());
+        System.out.println("Insertar genero:");
+        String genero = scanner.nextLine();
+        System.out.println("Insertar altura:");
+        float altura = scanner.nextInt();
+        System.out.println("Insertar nombre del equipo:");
+        String equipo = scanner.nextLine();
+        System.out.println("Insertar total MPV");
+        int mvp = scanner.nextInt();
+
+        Statement statement = null;
+        statement = conn.createStatement();
+
+        statement.executeUpdate("INSERT INTO player VALUES" +
+                " ('"+federation+"','"+nombre+"','"+apellidos+"','"+date+"','"+genero+"','"+altura+"','"+equipo+"','"+mvp+"')");
+        statement.close();
+    }
+
+    public void crearMatch() throws SQLException, ParseException{
+        Scanner scanner = new Scanner(System.in);
+        SimpleDateFormat fecha = new SimpleDateFormat("yyyy-MM-dd");
+        System.out.println("Insertar equipo local");
+        String home_team = scanner.nextLine();
+        System.out.println("Insertar equipo visitante");
+        String visitor_team = scanner.nextLine();
+        System.out.println("Insertar fecha del enfrentamiento (yyyy-MM-dd:0000-00-00");
+        Date date = fecha.parse(scanner.nextLine());
+        System.out.println("Insertar assistencia");
+        Long assistencia = scanner.nextLong();
+        System.out.println("Insertar MVP");
+        String mvp = scanner.nextLine();
+        Statement statement = null;
+        statement.executeUpdate("INSERT INTO match VALUES ('"+home_team+"','"+visitor_team+"','"+date+"','"+assistencia+"','"+mvp+"')");
+        statement.close();
+
+    }
+
+    public void jugadorSinEquipo() throws SQLException{
+        Statement statement = conn.createStatement();
+        ResultSet resultSet;
+
+        resultSet = statement.executeQuery("SELECT * FROM player WHERE team_name is null");
+        while (resultSet.next()) {
+            System.out.println("Federation license code: "+resultSet.getString("federation_license_code")+"\t" +
+                    "First name: "+resultSet.getString("first_name")+"\t" +
+                    "Last name: "+resultSet.getString("last_name")+"\t" +
+                    "birth date: "+resultSet.getString("birth_date")+"\t" +
+                    "Gender: "+resultSet.getString("gender")+"\t" +
+                    "Gender: "+resultSet.getString("gender")+"\t" +
+                    "Height: "+resultSet.getString("height")+"\t" +
+                    "Team name: "+resultSet.getString("team_name")+"\t" +
+                    "MVP total: "+resultSet.getString("mvp_total"));
+        }
+        resultSet.close();
+        statement.close();
+    }
+
+    public void asignarJugadorAlEquipo(){
+
+    }
+
+    public void desvincularJugadorDelEquipo(){
+
+    }
+
+    public void cargarEstadisticas(){
+
     }
 
 
-    // TODO
-    public void actualitzarTitolRevistes(Connection conn) throws SQLException {
-        // TODO
-        // seguint l'exemple de la funció afegeixArticleARevista:
-        // definir variables locals
-        // realitzar la consulta de totes les revistes
-        // mentre hi hagi revistes:
-        // Mostrar el títol de la revista
-        // demanar si es vol canviar el seu títol
-        // en cas de que la resposta sigui "si"
-        // demanar el nou títol per la revista
-        // actualitzar el camp
-        // actualitzar la fila
-        Scanner reader = new Scanner(System.in);
-        ResultSet rs = null;
-        Statement st = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
-
-        rs = st.executeQuery("SELECT titol FROM revistes");
-        System.out.println(rs);
-    }
 
 
-    // TODO
-    public void desassignaArticleARevista(Connection conn) throws SQLException, IOException {
-
-        // TODO
-        // seguint l'exemple de la funció afegeixArticleARevista:
-        // definir variables locals
-        // sol·licitar l'identificador de la revista
-        // realitzar la consulta de tots els articles que corresponen a aquesta
-        // revista
-        // si no hi ha articles, emetre el missatge corresponent
-        // en altre cas, mentre hi hagi articles:
-        // Mostrar el títol de l'article i l'identificador de la revista
-        // demanar si es vol rescindir la seva incorporació a la revista
-        // en cas de que la resposta sigui "si"
-        // actualitzar el camp corresponent a null
-        // actualitzar la fila
-        // en altre cas imprimir "operació cancel·lada"
-
-
-    }
-
-
-    public void mostraAutors() throws SQLException, IOException {
-        Statement st = conn.createStatement();
-        Scanner reader = new Scanner(System.in);
-        ResultSet rs;
-
-        rs = st.executeQuery("SELECT * FROM autors");
-        while (rs.next()) System.out.println("ID: " +rs.getString("id_autor") + "\tNom: " + rs.getString("nom") + "\tAny Naixement: " + rs.getString("any_naixement") + "\tNacionalitat: " + rs.getString("nacionalitat") + "\tActiu: " + rs.getString("actiu"));
-        rs.close();
-        st.close();
-    }
-
-
-    public void mostraRevistes() throws SQLException, IOException {
-        Statement st = conn.createStatement();
-        Scanner reader = new Scanner(System.in);
-        ResultSet rs;
-
-        rs = st.executeQuery("SELECT * FROM revistes");
-        while (rs.next()) System.out.println("ID: " +rs.getString(1) + "\tTitol: " + rs.getString(2) + "\tData Publicacio: " + rs.getString(3));
-        rs.close();
-        st.close();
-    }
-
-
-    public void mostraRevistesArticlesAutors() throws SQLException, IOException {
-        Statement st = conn.createStatement();
-        Scanner reader = new Scanner(System.in);
-        ResultSet rs;
-
-        rs = st.executeQuery("SELECT a.nom, r.titol, ar.titol FROM autors a, revistes r, articles ar WHERE ar.id_autor=a.id_autor AND ar.id_revista=r.id_revista");
-        while (rs.next()) System.out.println("Nom autor: " +rs.getString(1) + "\tNomRevista: " + rs.getString(2) + "\tNom article: " + rs.getString(3));
-        rs.close();
-        st.close();
-
-    }
 
     public void sortir() throws SQLException {
         System.out.println("ADÉU!");
         conn.close();
     }
 
-    // TODO
-    public void carregaAutors(Connection conn) throws SQLException, NumberFormatException, IOException {
-        // TODO
-        // mitjançant Prepared Statement
-        // per a cada línia del fitxer autors.csv
-        //realitzar la inserció corresponent
-
-
-    }
 }
