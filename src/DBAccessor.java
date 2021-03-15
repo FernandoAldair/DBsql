@@ -223,7 +223,6 @@ public class DBAccessor {
         Statement statement = null;
         statement.executeUpdate("INSERT INTO match VALUES ('"+home_team+"','"+visitor_team+"','"+date+"','"+assistencia+"','"+mvp+"')");
         statement.close();
-
     }
 
     public void jugadorSinEquipo() throws SQLException{
@@ -246,8 +245,24 @@ public class DBAccessor {
         statement.close();
     }
 
-    public void asignarJugadorAlEquipo(){
+    public void asignarJugadorAlEquipo() throws SQLException{
+        Statement statement = conn.createStatement();
+        ResultSet resultSet;
 
+        resultSet = statement.executeQuery("SELECT * FROM player WHERE team_name is null");
+        while (resultSet.next()) {
+            System.out.println("Federation license code: "+resultSet.getString("federation_license_code")+"\t" +
+                    "First name: "+resultSet.getString("first_name")+"\t" +
+                    "Last name: "+resultSet.getString("last_name")+"\t" +
+                    "birth date: "+resultSet.getString("birth_date")+"\t" +
+                    "Gender: "+resultSet.getString("gender")+"\t" +
+                    "Gender: "+resultSet.getString("gender")+"\t" +
+                    "Height: "+resultSet.getString("height")+"\t" +
+                    "Team name: "+resultSet.getString("team_name")+"\t" +
+                    "MVP total: "+resultSet.getString("mvp_total"));
+        }
+        resultSet.close();
+        statement.close();
     }
 
     public void desvincularJugadorDelEquipo(){

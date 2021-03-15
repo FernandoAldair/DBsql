@@ -42,15 +42,15 @@ public class HemerotecaMain {
                     break;
 
                 case 5:
-
+                    dbaccessor.crearMatch();
                     break;
 
                 case 6:
-
+                    dbaccessor.jugadorSinEquipo();
                     break;
 
                 case 7:
-
+                    dbaccessor.asignarJugadorAlEquipo();
                     break;
 
                 case 8:
