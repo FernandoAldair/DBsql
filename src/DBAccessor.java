@@ -256,7 +256,6 @@ public class DBAccessor {
                     "Last name: "+resultSet.getString("last_name")+"\t" +
                     "birth date: "+resultSet.getString("birth_date")+"\t" +
                     "Gender: "+resultSet.getString("gender")+"\t" +
-                    "Gender: "+resultSet.getString("gender")+"\t" +
                     "Height: "+resultSet.getString("height")+"\t" +
                     "Team name: "+resultSet.getString("team_name")+"\t" +
                     "MVP total: "+resultSet.getString("mvp_total"));
